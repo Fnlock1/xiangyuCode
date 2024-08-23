@@ -11,18 +11,8 @@
 
 <script setup>
 import {ref,onMounted} from "vue"
-import Card from "../card/index.vue"
-import xDate from "../date/index.vue"
-import Button from "../button/index.vue"
 let list = ref([
-    {
-        name:"容器",
-        component:Card
-    },
-    {
-        name:"test",
-        component: xDate
-    }
+
 ])
 
 // 渲染列表
@@ -33,5 +23,7 @@ onMounted(()=>{
 </script>
 
 <style scoped>
-
+.container{
+    padding: 1em;
+}
 </style>

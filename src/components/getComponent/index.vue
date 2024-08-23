@@ -6,22 +6,13 @@
 </template>
 
 <script setup>
-import Button from "../button/index.vue";
-import Card from "../card/index.vue"
 import {reactive} from "vue";
 
 let name = defineModel('name')
 
 
 let componentsList = reactive([
-    {
-        name:"Button",
-        component:Button
-    },
-    {
-        name:"Card",
-        component: Card
-    }
+
 ])
 </script>
 
