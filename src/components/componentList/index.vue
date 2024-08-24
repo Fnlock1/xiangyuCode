@@ -18,6 +18,15 @@ let list = ref([
 // 渲染列表
 let renderViewList = defineModel('renderViewList')
 onMounted(()=>{
+    const components = import.meta.glob('/src/codeComponent/**/*.{js,vue}');
+
+// 处理文件
+    for (const path in components) {
+        console.log(path)
+        components[path]().then((module) => {
+            console.log('Loaded file:', path, module.default);
+        });
+    }
 })
 
 </script>
