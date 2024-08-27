@@ -1,37 +1,38 @@
-<script setup>
-import { ref, onMounted } from 'vue'
-
-// 引入 Monaco Editor
-import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
-
-
-// 在组件挂载后执行
-onMounted(() => {
-  const editor = monaco.editor.create(document.querySelector('.editor-container'), {
-    value: '{background:red}',
-    language: 'css',
-    theme:"vs-dark",
-  });
-
-})
-</script>
-
 <template>
-  <div class="editor-container">
-    <!-- 将编辑器容器绑定到 ref -->
-    <div id="editor" ref="editor"></div>
-  </div>
+  <Textarea
+      auto-resize="true"
+      v-model="curDataString"
+      rows="5"
+      cols="30"
+      v-if="curDataString"
+  />
 </template>
 
-<style scoped>
-.editor-container {
-  width: 100%;
-  height: 30vh;
-  padding: 15px;
-  background: #ffffff;
-}
-#editor {
-  width: 100%;
-  height: 100%;
-}
-</style>
+<script setup>
+import { ref, watch } from "vue";
+
+let curData = ref({});
+let curDataString = ref('');
+
+let renderViewList = defineModel('renderViewList');
+
+watch(renderViewList.value, (newValue) => {
+  const matchedItems = newValue.filter(x => x.class.includes('clickContainer'));
+  if (matchedItems.length > 0 ) {
+    curData.value = matchedItems[0];
+    curDataString.value = JSON.stringify(curData.value.styleOptions, null, 2); // 将对象转换为格式化的字符串
+  } else {
+    curData.value = {};
+    curDataString.value = ''; // 如果没有匹配项，重置 curDataString
+  }
+});
+
+// 监听 curDataString 的变化，更新 curData
+watch(curDataString, (newValue) => {
+  try {
+    curData.value.styleOptions = JSON.parse(newValue); // 将字符串转换为对象
+  } catch (e) {
+    curData.value.styleOptions = JSON.parse(newValue); // 将字符串转换为对象
+  }
+});
+</script>

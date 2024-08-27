@@ -42,8 +42,6 @@ function clickContainer(renderViewList: renderViewList, e: renderViewListItem, i
     e.class.push(className);
   }
 
-  // 打印更新后的状态以验证是否正确
-  console.log(renderViewList[i]);
 }
 
 

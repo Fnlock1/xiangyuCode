@@ -9,7 +9,7 @@
                 <Content v-model:renderViewList="renderViewList"></Content>
         </SplitterPanel>
         <SplitterPanel size="25">
-            <StyleOptions></StyleOptions>
+            <StyleOptions v-model:renderViewList="renderViewList"></StyleOptions>
         </SplitterPanel>
     </Splitter>
 
