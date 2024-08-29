@@ -12,6 +12,7 @@ declare module 'vue' {
     Button: typeof import('primevue/button')['default']
     ComponentList: typeof import('./src/components/componentList/index.vue')['default']
     Content: typeof import('./src/components/content/index.vue')['default']
+    D: typeof import('./src/components/d/index.vue')['default']
     GetComponent: typeof import('./src/components/getComponent/index.vue')['default']
     Image: typeof import('primevue/image')['default']
     Menu: typeof import('primevue/menu')['default']
