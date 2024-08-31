@@ -1,8 +1,5 @@
 <template>
-  <!-- :indent-with-tab="true" 是否自动获取焦点-->
-  {{ curData }}
-  ————————————————
-  {{ curDataString }}
+
 
   <codemirror v-model="curDataString" placeholder="Code goes here..." :style="{ height: '100%' }" :autofocus="true"
               :tabSize="1" :extensions="extensions" />
@@ -11,7 +8,6 @@
 <script lang="ts" setup>
 import { Codemirror } from "vue-codemirror";
 import { css } from "@codemirror/lang-css";
-import { oneDark } from "@codemirror/theme-one-dark";
 import { ref, watch } from "vue";
 import { EditorView } from "@codemirror/view";
 
@@ -22,7 +18,7 @@ let curDataString = ref('');
 let renderViewList = defineModel('renderViewList');
 
 // 监听 renderViewList 的变化
-watch(renderViewList.value, (newValue) => {
+watch(renderViewList, (newValue) => {
   const matchedItems = newValue.filter(x => x.class.includes('clickContainer'));
   if (matchedItems.length > 0) {
     curData.value = matchedItems[0];
@@ -33,35 +29,42 @@ watch(renderViewList.value, (newValue) => {
   }
 });
 
+watch(curDataString, (newValue) => {
+  // console.log(curData.value.styleOptions);
+  curData.value.styleOptions = parseCssString(newValue);
+})
+
 // 将对象转换为 CSS 样式字符串的函数
 function convertToCssString(styleOptions) {
   return Object.entries(styleOptions)
       .map(([key, value]) => `${key}: ${value};`)
       .join(' ');
 }
+// string->obj
+function parseCssString(cssString: string): Record<string, string> {
+  // 去除首尾的花括号和空格
+  let cleanString = cssString.trim().replace(/^\{\s*|\s*\}$/g, '');
+
+  // 用分号分割每个样式声明
+  let styleArray = cleanString.split(';').filter(Boolean);
+
+  // 创建样式对象
+  let styleObject: Record<string, string> = {};
+
+  // 遍历每个样式声明并填充对象
+  styleArray.forEach(style => {
+    let [key, value] = style.split(':').map(s => s.trim());
+    if (key && value) {
+      // 使用 kebab-case 属性名作为键
+      styleObject[key] = value;
+    }
+  });
+
+  return styleObject;
+}
+
 
 // 监听 curDataString 的变化，更新 curData
-watch(curDataString, (newValue) => {
-  try {
-    // 去除首尾花括号并转换为对象
-    let cleanString = newValue.replace(/^{\s*|\s*}$/g, ''); // 去除花括号和多余的空格
-    let styleArray = cleanString.split(';').filter(Boolean);
-    let styleObject = {};
-
-    styleArray.forEach(style => {
-      let [key, value] = style.split(':').map(s => s.trim());
-      if (key && value) {
-        styleObject[key] = value;
-      }
-    });
-
-    curData.value.styleOptions = styleObject;
-  } catch (e) {
-    console.error('Failed to parse CSS string:', e);
-    curData.value.styleOptions = {}; // 解析失败时重置为对象
-  }
-});
-
 
 // 编辑器主题配置
 let myTheme = EditorView.theme({
@@ -83,7 +86,7 @@ let myTheme = EditorView.theme({
   },
   "&.cm-focused .cm-selectionBackground, ::selection": {
     backgroundColor: "#0052D9",
-    color:'#FFFFFF'
+    color: '#FFFFFF'
   },
   ".cm-gutters": {
     backgroundColor: "#FFFFFF",

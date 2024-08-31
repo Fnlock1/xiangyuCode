@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-<!--    <img src="@/assets/logo.png" alt="">-->
+    <img src="@/assets/logo.svg" alt="">
     <h1>欢迎使用</h1>
     <Button label="使用" severity="success" raised  @click="()=>{
         router.push('/projectCreate')

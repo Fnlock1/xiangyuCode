@@ -9,7 +9,7 @@
                 <Content v-model:renderViewList="renderViewList"></Content>
         </SplitterPanel>
         <SplitterPanel size="25">
-            <StyleOptions v-model:renderViewList="renderViewList"></StyleOptions>
+            <StyleOptions  v-model:renderViewList="renderViewList"></StyleOptions>
         </SplitterPanel>
     </Splitter>
 
@@ -22,7 +22,6 @@ import Content from "@/components/content/index.vue";
 import StyleOptions from "@/components/styleOptions/index.vue";
 import {onMounted, ref} from "vue";
 import {getComponentsNameArray} from "@/utils/index.ts";
-import d from "@/components/d/index.vue"
 let componentsList = ref([])
 let renderViewList = ref([ // 渲染列表
 ])
