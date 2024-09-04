@@ -35,11 +35,14 @@ watch(curDataString, (newValue) => {
 })
 
 // 将对象转换为 CSS 样式字符串的函数
+// 将对象转换为格式化的 CSS 样式字符串的函数
 function convertToCssString(styleOptions) {
   return Object.entries(styleOptions)
-      .map(([key, value]) => `${key}: ${value};`)
-      .join(' ');
+      .map(([key, value]) => `  ${key}: ${value};`) // 每对属性-值放在新的一行并添加两个空格的缩进
+      .join('\n') + '\n'; // 每对属性-值对用换行符分隔，确保最后一对后有换行符
 }
+
+
 // string->obj
 function parseCssString(cssString: string): Record<string, string> {
   // 去除首尾的花括号和空格
