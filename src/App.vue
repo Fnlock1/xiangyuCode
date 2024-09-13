@@ -1,9 +1,11 @@
 <template>
-    <RouterView></RouterView>
+    <RouterView :key="router.currentRoute"></RouterView>
 </template>
 
 
-<script></script>
+<script setup>
+import router from "@/router/index.ts";
+</script>
 
 
 <style></style>
