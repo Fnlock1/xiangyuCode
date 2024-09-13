@@ -2,7 +2,7 @@
   <div class="content">
     <h1>欢迎使用</h1>
     <Button label="使用" severity="success" raised  @click="()=>{
-        router.push('/projectCreate')
+        router.push('/dashboard')
     }"/>
   </div>
 

@@ -20,6 +20,7 @@ let renderViewList = defineModel('renderViewList');
 // 监听 renderViewList 的变化
 watch(renderViewList, (newValue) => {
   const matchedItems = newValue.filter(x => x.class.includes('clickContainer'));
+  console.log(renderViewList);
   if (matchedItems.length > 0) {
     curData.value = matchedItems[0];
     curDataString.value = `{ ${convertToCssString(curData.value.styleOptions)} }`; // 将对象转换为带花括号的CSS样式字符串
