@@ -13,7 +13,7 @@ function setRouter(e){
 </script>
 
 <template>
-<div class="flex gap-2">
+<div class="flex">
   <div class="w-10% border-r-solid border-r-1 border-[#efeff5]">
     <n-menu
         :collapsed="collapsed"

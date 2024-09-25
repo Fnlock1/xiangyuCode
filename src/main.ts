@@ -12,12 +12,14 @@ import "html5-device-mockups"
 import Aura from '@primevue/themes/aura';
 // main.ts
 import 'virtual:uno.css'
-
+// @ts-ignore
+import {materialXy, tagList} from "./utils/elementType.js"
 import "../env.d.ts"
+import axios from "axios";
 // dev Css
 const app = createApp(App)
 
-
+axios.defaults.baseURL = "http://localhost:8000/"
 
 app.use(createPinia())
 app.use(router)
@@ -27,5 +29,6 @@ app.use(PrimeVue,{
                 preset: Aura
         }
 })
-
+materialXy.use(tagList)
+app.use(materialXy)
 app.mount('#app')
