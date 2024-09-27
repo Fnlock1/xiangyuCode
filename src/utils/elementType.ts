@@ -8,19 +8,25 @@ export let tagList = {
             rel: { type: "text", default: "noopener", desc: "定义链接与目标的关系" },
             class: { type: "text", default: "", desc: "CSS 类名" },
             id: { type: "text", default: "", desc: "元素的 ID" }
-        }
+        },
+        content: { type: "text", default: "内容", desc: "元素内的文本内容" }
+
     },
     div: {
         attributes: {
             class: { type: "text", default: "", desc: "CSS 类名" },
             id: { type: "text", default: "", desc: "元素的 ID" }
-        }
+        },
+        content: { type: "text", default: "内容", desc: "元素内的文本内容" }
+
     },
     p: {
         attributes: {
             class: { type: "text", default: "", desc: "CSS 类名" },
             id: { type: "text", default: "", desc: "元素的 ID" }
-        }
+        },
+        content: { type: "text", default: "内容", desc: "元素内的文本内容" }
+
     },
     button: {
         attributes: {
@@ -29,7 +35,8 @@ export let tagList = {
             text: { type: "text", default: "Click Me", desc: "按钮的显示文本" },
             class: { type: "text", default: "", desc: "CSS 类名" },
             id: { type: "text", default: "", desc: "元素的 ID" }
-        }
+        },
+        content: { type: "text", default: "内容", desc: "元素内的文本内容" }
     },
     img: {
         attributes: {
@@ -39,7 +46,8 @@ export let tagList = {
             height: { type: "number", default: 100, desc: "图片的高度（单位像素）" },
             class: { type: "text", default: "", desc: "CSS 类名" },
             id: { type: "text", default: "", desc: "元素的 ID" }
-        }
+        },
+        content: { type: "text", default: "内容", desc: "元素内的文本内容" }
     },
     input: {
         attributes: {
@@ -602,7 +610,8 @@ export let tagList = {
 class material{
     plugins = []
 
-    use(plugin){
+    use(plugin:object){
+        // @ts-ignore
         this.plugins.push(plugin)
         this.render()
     }
@@ -612,8 +621,16 @@ class material{
     render(){
         this.plugins =  this.plugins.map(x=>{
             // 对象循环
+            // @ts-ignore
             for(let key in x){
-                x[key].render =  h(key)
+                x[key].name = key
+                // @ts-ignore
+                let t:object = {}
+                for (let y in  x[key].attributes){
+                    t[y] = x[key].attributes[y].default
+                }
+                x[key].attributes.content =  { type: "text", default: "内容", desc: "元素内的文本内容" }
+                x[key].render =  h(key, t,x[key].attributes.content.default)
             }
             return x
         })

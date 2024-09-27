@@ -30,10 +30,12 @@ import layersTree from "@/components/layersTree/index.vue";
 
 
  function createNewItem(item) {
+   console.log(item)
   item = {
     styleOptions: {
     },
     class: [],
+    isComponent:false,
     id: uuidv4(),
     scriptSetup:[],
     children: [
@@ -44,16 +46,16 @@ import layersTree from "@/components/layersTree/index.vue";
         name: item.name,
         class:[],
         scriptSetup:[
-
         ],
         isComponent: true,
         props:{},
-        vFor:"1"
+        vFor:"1",
+        render:item.components.render
       }
     ]
   }
       createComponents(item, renderViewList.value)
-}
+ }
 
 onMounted(() => {
 

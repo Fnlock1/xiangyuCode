@@ -1,12 +1,16 @@
 <template>
 
-  <div v-for="(item, index) in componentsList"
+  <div
+      v-for="(item, index) in componentsList"
+      v-if="!render"
   >
     <component
         :key="index"
         :is="item" v-if="item?.directory === name"></component>
   </div>
-
+  <div v-if="render && render.children !== ''">
+    <component :is="render"></component>
+  </div>
 </template>
 
 <script setup>
@@ -14,14 +18,9 @@ import {onMounted, ref, watch} from "vue";
 import {getComponentsArray} from "@/utils/index.ts";
 
 const name = defineModel('name')
-let scriptSetup = defineModel('scriptSetup')
-let vFor = defineModel('vFor')
+const render = defineModel('render')
 const componentsList = ref([]);
-let forArray = ref([])
-watch(vFor,()=>{
-  forArray.value = new Array(vFor.value).fill(1)
 
-})
 onMounted(async () => {
   componentsList.value = await getComponentsArray();
 });

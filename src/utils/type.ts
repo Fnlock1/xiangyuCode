@@ -6,10 +6,15 @@ import {BsFiletypeHtml, BsFiletypeJson} from "vue-icons-plus/bs";
 import {TbBrandTypescript} from "vue-icons-plus/tb";
 import {SiUnocss} from "vue-icons-plus/si";
 
-type ComponentsItem = {
+type PageItem = {
     name: string;  // 属性的类型应该使用小写的 'string'
     components: any;
     src:string;
+    styleOptions:object;
+    class:Array<string>;
+    id:string;
+    scriptSetup:Array<object>,
+    children:renderViewChildren[] | [],
 };
 
 type renderViewList = renderViewListItem[]
@@ -18,19 +23,23 @@ type renderViewListItem = {
     styleOptions:Object,
     class:Array<string>,
     id:Array<string>,
-    children:renderViewChildren[] | []
+    children:renderViewChildren[] | [],
+    scriptSetup:Array<object>
 }
 
 type renderViewChildren = {
     styleOptions:object,
     id: string,
-    row: number,
-    col: number,
     name: string,
+    scriptSetup:Array<object>,
+    isComponent: boolean,
+    props:object,
+    vFor:string,
+    class:Array<string>
 }
 
 // 定义一个数组类型，它是由 ComponentsItem 对象组成的数组
-type ComponentsArray = ComponentsItem[];
+type ComponentsArray = PageItem[];
 
 
 
@@ -48,7 +57,7 @@ let direStatus = {
 
 
 export type {
-    ComponentsItem,
+    PageItem,
     ComponentsArray,
     renderViewList,
     renderViewListItem,

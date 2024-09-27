@@ -1,178 +1,133 @@
 <template>
-  <div>
+  <div class="bg-[#f2f2f2] h-100vh"
+       @mousedown="startDrag"
+       @mousemove="onDrag"
+       @mouseup="stopDrag"
+       @mouseleave="stopDrag"
+       @wheel="onWheel"> <!-- 监听滚动事件 -->
     <div
-         class="bg-[#f2f2f2] h-100vh"
-
+        :style="previewAreaStyle"
+        id="previewArea"
+        class="bg-white min-h-100vh max-h-fit"
+        @wheel.stop.prevent="onWheel"
     >
-      <div  style="width: 100%; overflow: hidden; transform: scale(.95) translate(0px, 0px); transform-origin: top left;"
-            id="previewArea"
-            class="bg-white min-h-100vh max-h-fit"
-      >
-        <!-- 左侧列表 -->
-        <div v-for="(element, index) in renderViewList"
-             :class="element?.class.includes('clickContainer') ? 'clickContainer' : '' "
-             @click.self="clickContainer(element, 'clickContainer')"
-        >
-          <vue-draggable
-              v-model="renderViewList[index].children"
-              group="shared"
-              @add="add"
-              @end="DragEnd"
-              ghost-class="ghost"
-              :key="element.id"
-              :style="element.styleOptions"
-              :class="element.class"
-
-          >
-            <div
-                v-for="(item, col) in element.children" :key="item.id">
-              <div
-                  @click="clickItem(item)"
-                  :class="item.class"
-                  :style="item.styleOptions" >
-                <GetComponent
-                    v-model:scriptSetup="item.scriptSetup"
-                    v-model:vFor="item.vFor"
-                    v-model:name="item.name" />
-              </div>
-            </div>
-          </vue-draggable>
-        </div>
-      </div>
-
-    </div>
+    <!-- 递归渲染 -->
+    <RenderContainer
+        v-for="(element, index) in renderViewList"
+        :key="element.id"
+        :element="element"
+        @click-container="clickContainer"
+        @click-item="clickItem"
+        @drag-start="onContainerDragStart"
+        @drag-end="onContainerDragEnd"
+    />
   </div>
+  </div>
+
+  <iframe id="preview" style="width: 500px;height: 300px;"></iframe>
 </template>
+<script setup>
+import {ref, computed, onMounted,watch} from 'vue';
+import RenderContainer from './RenderContainer.vue';  // 递归组件
 
-<script setup lang="ts">
-import { VueDraggable } from 'vue-draggable-plus';
-import {onMounted, ref} from 'vue';
-import { v4 as uuidv4 } from 'uuid';
-import GetComponent from "@/components/getComponent/index.vue";
-import { clickContainer as clickContainers2Utils } from "@/utils";
-import type { renderViewList as RenderViewListType, renderViewListItem as RenderViewListItemType } from "@/utils/type";
+// 响应式数据：存储渲染的视图列表
+const renderViewList = defineModel('renderViewList');
 
-// 创建响应式数据
-const renderViewList = defineModel('renderViewList') as Ref<RenderViewListType>;
-let scale = .95;
-let translateX = 0;
-let translateY = 0;
-let isDragging = false;
-let startX, startY;
+// 画布缩放和拖拽状态
+let scale = 0.95;
+let translateX = ref(0);
+let translateY = ref(0);
+let isDragging = ref(false);
+let startX = 0;
+let startY = 0;
+let isContainerDragging = ref(false); // 标记拖拽组件是否正在被拖拽
 
 
-function clickItem(item){
-  clearAllClass()
-  renderViewList.value = renderViewList.value.map(el => {
-    el.children.map(x=>{
-      if (x.class.includes('clickContainer')) {
-        x.class = x.class.filter(cls => cls !== 'clickContainer');
-      }
-      if (x.id === item.id){
-        x.class.push('clickContainer')
-      }
-      return x
-    })
-    return el
-  });
+watch(renderViewList.value,(v)=>{
+  let content = document.getElementById('previewArea');
+  let preview = document.getElementById('preview');
+
+// 获取所有 <style> 标签
+  let styles = Array.from(document.getElementsByTagName('style')).map(style => style.outerHTML);
+
+// 获取所有 <link> 标签（例如，外部 CSS 文件）
+  let links = Array.from(document.getElementsByTagName('link')).map(link => link.outerHTML);
+
+// 创建一个包含 Unocss 样式和 HTML 内容的完整 HTML 字符串
+  let html = `
+<!DOCTYPE html>
+<html>
+<head>
+    ${links.join('\n')} <!-- 引入所有的 link 标签 -->
+    ${styles.join('\n')} <!-- 引入所有的 style 标签 -->
+</head>
+<body>
+    ${content.innerHTML} <!-- 你的内容 -->
+</body>
+</html>
+`;
+
+// 将 HTML 字符串设置为 iframe 的 srcdoc
+  preview.srcdoc = html;
+})
+
+
+// 拖拽相关逻辑
+function startDrag(event) {
+  if (isContainerDragging.value) return; // 如果拖拽组件正在拖拽，禁止画布拖动
+  isDragging.value = true;
+  startX = event.clientX - translateX.value;
+  startY = event.clientY - translateY.value;
 }
 
-// 处理点击容器
-function clickContainer(element: RenderViewListItemType, className: string): void {
-  clearAllClass()
-
-  const updatedList = renderViewList.value.map(el => {
-
-    const updatedClass = el.class.filter(cls => cls !== className);
-    if (el.id === element.id) {
-      updatedClass.push(className);
-    }
-    return { ...el, class: updatedClass };
-  });
-  // 更新模型或状态
-  renderViewList.value = updatedList;
+function onDrag(event) {
+  if (isDragging.value) {
+    translateX.value = event.clientX - startX;
+    translateY.value = event.clientY - startY;
+  }
 }
 
-// 添加拖拽项的处理函数
-function add(event) {
+function stopDrag() {
+  isDragging.value = false;
 }
 
-function DragEnd() {
-  isDragging = false
+// 计算预览区域样式
+const previewAreaStyle = computed(() => ({
+  transform: `scale(${scale}) translate(${translateX.value}px, ${translateY.value}px)`,
+  transformOrigin: 'top left',
+}));
+
+// 拖拽组件开始和结束事件
+function onContainerDragStart() {
+  isContainerDragging.value = true; // 开始拖拽组件时，禁用画布拖拽
 }
 
+function onContainerDragEnd() {
+  isContainerDragging.value = false; // 结束拖拽组件时，恢复画布拖拽
+}
 
+// 处理滚动逻辑
+function onWheel(event) {
+  // 阻止默认的外层滚动行为
+  event.preventDefault();
 
+  // 垂直滚动：调整 translateY
+  if (event.deltaY !== 0) {
+    translateY.value += event.deltaY;
+  }
+  // 水平滚动：调整 translateX
+  if (event.deltaX !== 0) {
+    translateX.value += event.deltaX;
+  }
+}
 
 onMounted(()=>{
-  const previewArea = document.getElementById('previewArea')
 
-
-
-
-// 监听滚轮事件
-  previewArea.addEventListener('wheel', function (event) {
-    event.preventDefault(); // 阻止默认页面的滚轮缩放行为
-
-    if (event.ctrlKey) {
-      // 按住 Ctrl 键时调整缩放比例
-      if (event.deltaY > 0) {
-        scale = Math.max(0.1, scale - 0.1); // 缩小，限制最小为 0.1
-      } else {
-        scale = Math.min(3, scale + 0.1); // 放大，限制最大为 3
-      }
-
-      // 更新预览区的缩放效果
-      previewArea.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-    } else {
-      // 未按住 Ctrl 键时上下滚动内容
-      translateY -= event.deltaY; // 滚轮上滚为负，下滚为正
-      previewArea.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-    }
-  });
-
-// 监听鼠标按下事件，开始拖动
-  previewArea.addEventListener('mousedown', function (event) {
-    isDragging = true;
-    startX = event.clientX - translateX;
-    startY = event.clientY - translateY;
-    previewArea.style.cursor = 'grabbing';  // 修改鼠标样式
-  });
-
-// 监听鼠标移动事件，拖动内容
-  window.addEventListener('mousemove', function (event) {
-    if (isDragging) {
-      translateX = event.clientX - startX;
-      translateY = event.clientY - startY;
-      previewArea.style.transform = `scale(${scale}) translate(${translateX}px, ${translateY}px)`;
-    }
-  });
-
-// 监听鼠标松开事件，停止拖动
-  window.addEventListener('mouseup', function () {
-    isDragging = false;
-    previewArea.style.cursor = 'default';  // 恢复鼠标样式
-  });
 
 })
 
-function clearAllClass() {
-  renderViewList.value = renderViewList.value.map(el => {
-    el.class = el.class.filter(cls => cls !== 'clickContainer');
-    el.children.map(x=>{
-      if (x.class.includes('clickContainer')) {
-        x.class = x.class.filter(cls => cls !== 'clickContainer');
-      }
-    })
-    return el
-  })
-}
-
-
 </script>
-
 <style scoped>
-/* 定义拖拽过程中的样式 */
 .ghost {
   opacity: 0.5;
 }

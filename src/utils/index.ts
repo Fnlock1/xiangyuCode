@@ -1,4 +1,10 @@
-import {type ComponentsArray, direStatus, type renderViewList, type renderViewListItem} from "@/utils/type";
+import {
+    type ComponentsArray,
+    type PageItem,
+    direStatus,
+    type renderViewList,
+    type renderViewListItem
+} from "@/utils/type";
 import type {IconType} from "vue-icons-plus/lib";
 
 // 定义一个异步函数，用于获取所有组件数组
@@ -68,9 +74,9 @@ function clickContainer( e: renderViewListItem, i: number, className: string) {
 
 
 // 创建新的组件
-function createComponents(newRenderItems: renderViewListItem, renderViewList: renderViewList): renderViewList {
+function createComponents(newRenderItems: object, renderViewList: Array<object>): renderViewList {
     renderViewList.push(newRenderItems);
-    return renderViewList;
+    return <renderViewListItem[]>renderViewList;
 }
 
 

@@ -74,8 +74,8 @@ onMounted(async () => {
 })
 
 function exportJson(){
-
-
+  console.log(renderViewList.value)
+return ;
   axios.get('/api/generateVue',{
     params:{
       components:renderViewList.value
