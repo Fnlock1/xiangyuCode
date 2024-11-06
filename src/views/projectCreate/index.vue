@@ -10,11 +10,11 @@
       <div class="text-center">pageName</div>
       <!--        导出 预览-->
       <div class="flex gap-3 justify-end items-center">
-        <n-popselect v-model:value="settingShow" :options="settingOption" trigger="click">
-          <CgMoreVerticalAlt class="cursor-pointer"/>
+        <n-popselect @update:value="settingFn" v-model:value="settingShow" :options="settingOption" trigger="click">
+          <CgMoreVerticalAlt class="cursor-pointer w-12 h-12"/>
         </n-popselect>
 
-        <TbBrandNpm class="color-[#cb0000] w-8s cursor-pointer" @click="npmShow=!npmShow"/>
+        <TbBrandNpm class="color-[#cb0000] w-14 h-14 cursor-pointer" @click="npmShow=!npmShow"/>
 
         <div class="flex gap-3 bg-[#f2f2f2] p-4 pt-2 pb-2 rounded-xl items-end">
           <BsPhone class="headIcon"/>
@@ -35,7 +35,7 @@
   </header>
 
   <NpmShow v-model:npm-show="npmShow"></NpmShow>
-
+  <DataBase v-model:dataBaseShow="dataBaseShow"></DataBase>
 
   <Splitter class="tabBar">
     <SplitterPanel size="25">
@@ -57,7 +57,9 @@ import ComponentList from "@/components/componentList/index.vue";
 import Content from "@/components/content/index.vue";
 import StyleOptions from "@/components/styleOptions/index.vue";
 import NpmShow from "@/components/npmShow/index.vue"
-import {onMounted, ref} from "vue";
+import DataBase from "@/components/dataBase/index.vue"
+
+import {compile, onMounted, ref, watch} from "vue";
 import {getComponentsNameArray} from "@/utils/index.ts";
 import {BiExport} from "vue-icons-plus/bi";
 import {IpPreviewOpen} from "vue-icons-plus/ip";
@@ -68,29 +70,32 @@ import {CgMoreVerticalAlt} from "vue-icons-plus/cg";
 import axios from "axios"
 import {FiDatabase} from "vue-icons-plus/fi";
 let npmShow = ref(false)
+let dataBaseShow = ref(false)
 // 设置选型
 let settingShow =ref(false)
 let settingOption = [
   {
     label:"Database",
-    value:"Database"
+    value:"Database",
+    fn:(v)=>{
+      console.log(v)
+      dataBaseShow.value =!dataBaseShow.value
+    }
   }
 ]
 let componentsList = ref([])
-let renderViewList = ref([ // 渲染列表
-])
-
+let langMode = ref('h5')
+let renderViewList = ref([ ]) // 渲染列表
 
 onMounted(async () => {
   componentsList.value = await getComponentsNameArray()
 })
 
 function exportJson() {
-  console.log(renderViewList.value)
-  axios.get('/api/generateVue', {
-    params: {
-      components: JSON.stringify(renderViewList.value)
-    }
+  console.log(encodeURIComponent(JSON.stringify(renderViewList.value)))
+  axios.post('/api/generateCode', {
+      components: JSON.stringify(renderViewList.value),
+    langMode:langMode.value
   }).then(res => {
     console.log(res)
   })
@@ -109,6 +114,16 @@ function clearDiv() {
     return hasClickContainer || hasChildren;
   });
 }
+
+
+function settingFn(v){
+  settingOption.forEach(x=>{
+    if (x.label === v){
+      x.fn(v)
+    }
+  })
+}
+
 
 </script>
 

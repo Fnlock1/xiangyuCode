@@ -11,16 +11,23 @@ declare module 'vue' {
     Avatar: typeof import('primevue/avatar')['default']
     Badge: typeof import('primevue/badge')['default']
     Button: typeof import('primevue/button')['default']
+    Checkbox: typeof import('primevue/checkbox')['default']
+    CompoentsPage: typeof import('./src/components/compoentsPage/index.vue')['default']
     ComponentList: typeof import('./src/components/componentList/index.vue')['default']
     Content: typeof import('./src/components/content/index.vue')['default']
+    DataBase: typeof import('./src/components/dataBase/index.vue')['default']
     GeneratedComponent: typeof import('./src/components/GeneratedComponent.vue')['default']
     GetComponent: typeof import('./src/components/getComponent/index.vue')['default']
+    IconField: typeof import('primevue/iconfield')['default']
     Image: typeof import('primevue/image')['default']
+    InputIcon: typeof import('primevue/inputicon')['default']
+    InputText: typeof import('primevue/inputtext')['default']
     LayersTree: typeof import('./src/components/layersTree/index.vue')['default']
     Menu: typeof import('primevue/menu')['default']
     NAutoComplete: typeof import('naive-ui')['NAutoComplete']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NButton: typeof import('naive-ui')['NButton']
+    NButtonGroup: typeof import('naive-ui')['NButtonGroup']
     NCard: typeof import('naive-ui')['NCard']
     NCarousel: typeof import('naive-ui')['NCarousel']
     NCollapse: typeof import('naive-ui')['NCollapse']
@@ -52,6 +59,7 @@ declare module 'vue' {
     StyleOptions: typeof import('./src/components/styleOptions/index.vue')['default']
   }
   export interface ComponentCustomProperties {
+    FocusTrap: typeof import('primevue/focustrap')['default']
     Ripple: typeof import('primevue/ripple')['default']
   }
 }

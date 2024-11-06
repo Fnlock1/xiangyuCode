@@ -8,9 +8,10 @@
                @close="delClass(item, index)"
                type="success">{{ item }}
         </n-tag>
-      </div>
+       </div>
     </n-tab-pane>
     <n-tab-pane name="Style" tab="style">
+
       <codemirror
           v-model="curDataString"
           placeholder="Code goes here..."

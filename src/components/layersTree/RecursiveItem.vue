@@ -7,7 +7,7 @@
       @mouseenter="mouseMove"
   >
     <template #header>
-      <div :data-id="item.id" class="collapseX">{{ item.name+item.id || 'div' }}</div>
+      <div :data-id="item.id" class="collapseX">{{ item.name || 'div' }}</div>
     </template>
 
     <!-- 递归渲染子元素 -->

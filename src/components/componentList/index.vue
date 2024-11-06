@@ -1,7 +1,9 @@
 <template>
   <div class="container  p4">
     <n-tabs type="segment" class="siyuan">
-      <n-tab-pane name="page"></n-tab-pane>
+      <n-tab-pane name="page">
+        <componentsPage @changeProject="changeProject" v-model:projectId="projectId" v-model:renderViewList="renderViewList" v-model:pageId="pageId"></componentsPage>
+      </n-tab-pane>
 
       <n-tab-pane name="components">
         <div class="xContainer grid grid-cols-3 gap-2 mt-8">
@@ -11,55 +13,76 @@
         </div>
       </n-tab-pane>
       <n-tab-pane name="Layers" class="">
-        <layersTree v-model:renderViewList="renderViewList"></layersTree>
+        <layersTree @update:renderViewList="uploadRenderView(renderViewList)" v-model:renderViewList="renderViewList"></layersTree>
       </n-tab-pane>
     </n-tabs>
   </div>
 </template>
 
 <script setup>
-import {ref, onMounted, watch} from "vue"
+import {ref, onMounted, watch, onBeforeMount} from "vue"
 import {createComponents} from "@/utils/index.ts";
 import {v4 as uuidv4} from 'uuid';
-
+import componentsPage from '@/components/compoentsPage/index.vue'
+import layersTree from "@/components/layersTree/index.vue";
+import {request} from "@/utils/request.js";
+import {api} from "@/api/index.js";
+import router from "@/router/index.ts";
 // 渲染列表
 let renderViewList = defineModel('renderViewList')
 // 组件列表
 let contentList = defineModel('componentsList')
-import layersTree from "@/components/layersTree/index.vue";
+// pageId
+let pageId = ref(null);
+let projectId = ref(null)
 
 
- function createNewItem(item) {
-   console.log(item)
+
+function  uploadRenderView(renderView){
+  request(api.projectPageConfigAdd,'put',{
+    pageId:pageId.value,
+    projectId:projectId.value,
+    pageContent:encodeURIComponent(JSON.stringify(renderView))
+  })
+}
+
+function createNewItem(item) {
   item = {
-    styleOptions: {
-    },
+    styleOptions: {},
     class: [],
-    isComponent:false,
+    isComponent: false,
     id: uuidv4(),
-    scriptSetup:[],
+    scriptSetup: [],
     children: [
       {
-        styleOptions: {
-        },
+        styleOptions: {},
         id: uuidv4(),
         name: item.name,
-        class:[],
-        scriptSetup:[
-        ],
+        class: [],
+        scriptSetup: [],
         isComponent: true,
-        props:{},
-        vFor:"1",
-        render:item.components.render
+        props: {},
+        vFor: "1",
+        render: item.components.render
       }
     ]
   }
-      createComponents(item, renderViewList.value)
- }
+  createComponents(item, renderViewList.value)
+  console.log()
+  uploadRenderView(renderViewList.value)
+}
 
-onMounted(() => {
 
+function changeProject(v){
+  console.log(v)
+}
+
+onBeforeMount(() => {
+  projectId.value = router.currentRoute.value.params.id
 })
+
+
+
 
 </script>
 

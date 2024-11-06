@@ -14,11 +14,13 @@ import Aura from '@primevue/themes/aura';
 import 'virtual:uno.css'
 import "../env.d.ts"
 import axios from "axios";
+import setupLocatorUI from "@locator/runtime";
+// @ts-ignore
+import {keyContainer} from "@/utils/keyDown.js"
 // dev Css
 const app = createApp(App)
 
 axios.defaults.baseURL = "http://localhost:8000/"
-import setupLocatorUI from "@locator/runtime";
 
 if (process.env.NODE_ENV === "development") {
         setupLocatorUI({
@@ -29,6 +31,7 @@ if (process.env.NODE_ENV === "development") {
 
 
 app.use(createPinia())
+app.use(keyContainer)
 app.use(router)
 app.use(PrimeVue,{
         unstyle:true,

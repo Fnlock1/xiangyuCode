@@ -41,34 +41,37 @@ let isDragging = ref(false);
 let startX = 0;
 let startY = 0;
 let isContainerDragging = ref(false); // 标记拖拽组件是否正在被拖拽
+let html = ref('')
 
+watch(renderViewList,(v)=>{
+//   let content = document.getElementById('previewArea');
+//   let preview = document.getElementById('preview');
+//
+// // 获取所有 <style> 标签
+//   let styles = Array.from(document.getElementsByTagName('style')).map(style => style.outerHTML);
+//
+// // 获取所有 <link> 标签（例如，外部 CSS 文件）
+//   let links = Array.from(document.getElementsByTagName('link')).map(link => link.outerHTML);
+//
+// // 创建一个包含 Unocss 样式和 HTML 内容的完整 HTML 字符串
+//   let html = `
+// <!DOCTYPE html>
+// <html>
+// <head>
+//     ${links.join('\n')} <!-- 引入所有的 link 标签 -->
+//     ${styles.join('\n')} <!-- 引入所有的 style 标签 -->
+// </head>
+// <body>
+//     ${content.innerHTML} <!-- 你的内容 -->
+// </body>
+// </html>
+// `;
+//
+// // 将 HTML 字符串设置为 iframe 的 srcdoc
+//   preview.srcdoc = html;
 
-watch(renderViewList.value,(v)=>{
-  let content = document.getElementById('previewArea');
-  let preview = document.getElementById('preview');
+    // html.value =generateTemplate(renderViewList.value)
 
-// 获取所有 <style> 标签
-  let styles = Array.from(document.getElementsByTagName('style')).map(style => style.outerHTML);
-
-// 获取所有 <link> 标签（例如，外部 CSS 文件）
-  let links = Array.from(document.getElementsByTagName('link')).map(link => link.outerHTML);
-
-// 创建一个包含 Unocss 样式和 HTML 内容的完整 HTML 字符串
-  let html = `
-<!DOCTYPE html>
-<html>
-<head>
-    ${links.join('\n')} <!-- 引入所有的 link 标签 -->
-    ${styles.join('\n')} <!-- 引入所有的 style 标签 -->
-</head>
-<body>
-    ${content.innerHTML} <!-- 你的内容 -->
-</body>
-</html>
-`;
-
-// 将 HTML 字符串设置为 iframe 的 srcdoc
-  preview.srcdoc = html;
 })
 
 
@@ -124,7 +127,67 @@ function onWheel(event) {
 onMounted(()=>{
 
 
+
 })
+
+// 生成模板部分（递归）
+function generateTemplate(data) {
+  let html = '';
+  data.forEach(component => {
+    // console.log(component.name)
+    // 处理组件类型
+    const tag = component.name || 'div';
+
+    // 处理类名
+    let classNames = (component.class || []).join(' ');
+    let id = component.id || '';
+    const vFor = component.vFor ? `v-for="item in items" :key="item.id"` : '';
+
+    // props 进行总的拼接
+    let props = ''
+    let content = ''
+    let propsNotShow = ['class', 'id']
+    if (component.isComponent === false) { // 他这个是原生的组件
+      content = component?.render?.children === undefined ?'' :component?.render?.children
+    }
+
+    if (component.props) {
+      for (const key in component.props) {
+
+        if (key === 'class') {
+          classNames += ` ${component.props[key].default}`
+        } else if (key === 'id') {
+          id = component.props[key].default
+        } else {
+          props += `${key}='${component.props[key].default}' `
+        }
+      }
+    }
+
+    // 生成当前节点的 HTML
+    html += `<${tag} class="${classNames}" id="${id}" ${vFor} ${props}`;
+
+    // 处理事件绑定
+    if (component.scriptSetup) {
+      component.scriptSetup.forEach(event => {
+        // 动态绑定事件
+        html += ` @${event.type}="${event.name}()"`;
+      });
+    }
+    console.log(component.isComponent,component.render)
+    // 关闭标签
+    html += `>${content}`;
+
+    // 如果有子组件，递归生成
+    if (component.children) {
+      html += generateTemplate(component.children);
+    }
+
+    // 关闭标签
+    html += `</${tag}>\n`;
+  });
+  return html;
+}
 
 </script>
 <style scoped>

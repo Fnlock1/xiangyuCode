@@ -46,11 +46,10 @@ const router = createRouter({
             ]
         },
         {
-            path:"/projectCreate",
+            path:"/projectCreate/:id",
             name:"项目创建",
             component:ProjectCreate
         },
-
         {
             path:"/debug",
             name:"实现功能",
