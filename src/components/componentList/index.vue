@@ -53,6 +53,7 @@ function createNewItem(item) {
     isComponent: false,
     id: uuidv4(),
     scriptSetup: [],
+    name:"div",
     children: [
       {
         styleOptions: {},

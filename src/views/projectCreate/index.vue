@@ -84,7 +84,7 @@ let settingOption = [
   }
 ]
 let componentsList = ref([])
-let langMode = ref('h5')
+let langMode = ref('uniapp')
 let renderViewList = ref([ ]) // 渲染列表
 
 onMounted(async () => {
@@ -92,12 +92,11 @@ onMounted(async () => {
 })
 
 function exportJson() {
-  console.log(encodeURIComponent(JSON.stringify(renderViewList.value)))
   axios.post('/api/generateCode', {
       components: JSON.stringify(renderViewList.value),
     langMode:langMode.value
   }).then(res => {
-    console.log(res)
+    console.log(renderViewList.value)
   })
 }
 
